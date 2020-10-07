@@ -1,0 +1,13 @@
+{
+  "name": "mini_synth",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "KJ Shanks <kyle.j.shanks@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron ."
+  },
+  "devDependencies": {
+    "electron": "^10.1.3"
+  }
+}
