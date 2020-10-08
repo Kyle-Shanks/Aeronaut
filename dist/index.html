@@ -1,6 +1,8 @@
 <html>
     <head>
-        <meta charset="UTF-8">
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" type="text/css" href="css/style.css" />
         <title>Hello World!</title>
         <!-- https://electronjs.org/docs/tutorial/security#csp-meta-tag -->
         <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
@@ -8,11 +10,12 @@
 
     <body>
         <h1>Hello World!</h1>
-        We are using node
-        <script>document.write(process.versions.node)</script>,
-        Chrome
-        <script>document.write(process.versions.chrome)</script>,
-        and Electron
-        <script>document.write(process.versions.electron)</script>.
+        <script type="module">
+            import Mini from "./js/mini.js";
+
+            const mini = new Mini();
+            mini.install(document.body);
+            mini.start();
+        </script>
     </body>
 </html>

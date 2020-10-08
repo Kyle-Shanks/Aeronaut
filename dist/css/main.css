@@ -1,0 +1,8 @@
+* {
+    box-sizing: border-box;
+}
+body {
+    transition: none;
+    background-color: #000;
+    color: #fff;
+}
