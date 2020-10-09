@@ -27,8 +27,8 @@ input {
     -webkit-app-region: drag;
 }
 
-/* Mini */
-#mini { display: block; position: relative; }
+/* Aeronaut */
+#aeronaut { display: block; position: relative; }
 
 /* Mixer */
 #mixer {
@@ -50,7 +50,23 @@ input {
 #commander input {
     width: calc(100vw - 4rem);
     margin-top: 1.5rem;
-    padding: 0.25rem 0.5rem 0;
+    padding: 0.25rem 1rem 0 0.5rem;
     border-top: 1px solid #fff;
     border-left: 1px solid #fff;
+}
+
+/* Recorder */
+#recorder {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    height: 1rem;
+    width: 1rem;
+    text-align: center;
+}
+
+#recorder.recording { animation: blink 1s cubic-bezier(0.6, 0, 0.3, 1) infinite; }
+@keyframes blink {
+    0% { color: #e81111; }
+    100% { color: #fff; }
 }

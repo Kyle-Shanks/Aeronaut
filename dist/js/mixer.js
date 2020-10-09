@@ -2,11 +2,11 @@ import Gain from './nodes/gain.js';
 import SimpleSynth from './simpleSynth.js';
 
 export default class Mixer {
-    constructor() {
+    constructor(aeronaut) {
         this.el = document.createElement('div');
         this.el.id = 'mixer';
 
-        this.AC = new AudioContext();
+        this.AC = aeronaut.AC;
         this.masterVolume = new Gain(this.AC); // Master Volume
 
         this.channels = [];

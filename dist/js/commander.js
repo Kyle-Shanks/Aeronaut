@@ -1,5 +1,5 @@
 export default class Commander {
-    constructor(mini) {
+    constructor(aeronaut) {
         this.el = document.createElement('div');
         this.el.id = 'commander';
 
@@ -10,7 +10,7 @@ export default class Commander {
 
         this.input.onkeydown = (e) => {
             switch (e.key) {
-                case 'Enter': e.preventDefault(); this.run(mini); break;
+                case 'Enter': e.preventDefault(); this.run(aeronaut); break;
                 case 'ArrowDown': e.preventDefault(); this.historyDown(); break;
                 case 'ArrowUp': e.preventDefault(); this.historyUp(); break;
             }
@@ -28,14 +28,15 @@ export default class Commander {
         this.input.focus();
     }
 
-    run(mini) {
-        if (this.input.value) {
-            if (this.input.value !== this.history[this.history.length - 1]) {
-                this.history.push(this.input.value);
+    run(aeronaut) {
+        const val = this.input.value.replace(/\s+/g, '');
+        if (val) {
+            if (val !== this.history[this.history.length - 1]) {
+                this.history.push(val);
             }
             this.historyIndex = this.history.length;
 
-            mini.mixer.run(this.input.value);
+            aeronaut.mixer.run(val);
             this.input.value = '';
         }
     }

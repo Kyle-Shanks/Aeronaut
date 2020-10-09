@@ -1,9 +1,11 @@
 const dgram = require('dgram');
 
-export default function Listener(mini) {
+export default function Listener(aeronaut) {
     this.server = dgram.createSocket('udp4');
 
-    this.server.on('message', (msg, rinfo) => { mini.mixer.run(`${msg}`); });
+    this.server.on('message', (msg, rinfo) => {
+        aeronaut.mixer.run(`${msg}`.replace(/\s+/g, ''));
+    });
 
     this.server.on('listening', () => {
         const address = this.server.address();
