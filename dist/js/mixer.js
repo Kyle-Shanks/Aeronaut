@@ -43,7 +43,6 @@ export default class Mixer {
     }
 
     run(msg) {
-        console.log(msg);
         if (msg.length < 3) return;
 
         // Multiple message check

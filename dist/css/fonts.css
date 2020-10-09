@@ -1,0 +1,7 @@
+/* Font */
+@font-face {
+    font-family: 'source_code_pro_regular';
+    src: url('../fonts/SourceCodePro-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}

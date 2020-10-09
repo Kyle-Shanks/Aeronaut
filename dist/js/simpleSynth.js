@@ -1,6 +1,7 @@
 import * as Nodes from './nodes/index.js';
 import { clamp, noteToFreq } from './util.js';
 
+const canvasUnit = 16;
 const WAVENAMES = ['si', 'tr', 'sq', 'sw'];
 const WAVEFORMS = ['sine', 'triangle', 'square', 'sawtooth'];
 
@@ -18,11 +19,26 @@ export default class SimpleSynth {
         this.oscEl = document.createElement('span');
         this.oscEl.className = `osc`;
 
+        this.canvas = document.createElement('canvas');
+        this.canvas.width = canvasUnit * 2;
+        this.canvas.height = canvasUnit * 2;
+        this.canvas.style.width = `${canvasUnit}px`;
+        this.canvas.style.height = `${canvasUnit}px`;
+
+        this.ctx = this.canvas.getContext('2d');
+        this.ctx.lineJoin = 'round';
+        this.ctx.lineWidth = 2;
+        this.ctx.strokeStyle = '#fff';
+
+        this.lastCnvUpdate = null;
+        this.lastNote = null;
+
         this.cidEl.innerHTML = id.toString(16);
 
         this.el.appendChild(this.cidEl);
         this.el.appendChild(this.envEl);
         this.el.appendChild(this.oscEl);
+        this.el.appendChild(this.canvas);
 
         this.volume = new Nodes.Gain(this.AC); // Volume
         this.gain = new Nodes.Gain(this.AC); // ADSR Gain
@@ -53,6 +69,7 @@ export default class SimpleSynth {
 
     start() {
         this.updateAllEl();
+        this.loop();
     }
 
     connect(destination) {
@@ -77,7 +94,6 @@ export default class SimpleSynth {
     }
 
     run(msg) {
-        console.log(`${this.el.id} running ${msg}`);
         const data = this.parse(msg);
         if (!data) { console.warn(`Unknown data`); return; }
 
@@ -171,6 +187,7 @@ export default class SimpleSynth {
         // Note Off timeout based on note length
         const offTimeoutId = setTimeout(() => { this.noteOff(); }, (length * 1000));
         this.timeoutIds.push(offTimeoutId);
+        this.lastNote = performance.now();
     }
     noteOff = () => {
         this.clearTimeouts();
@@ -183,6 +200,33 @@ export default class SimpleSynth {
 
     clearTimeouts() {
         this.timeoutIds.forEach((id) => clearTimeout(id));
+    }
+
+    // Canvas Functions
+    draw() {
+        if (this.lastCnvUpdate && performance.now() - this.lastCnvUpdate < 30) return;
+
+        this.ctx.clearRect(0, 0, canvasUnit * 2, canvasUnit * 2);
+        this.drawActivity();
+        this.lastCnvUpdate = performance.now();
+    }
+
+    drawActivity() {
+        if (!this.lastNote) return;
+
+        const elapsed = performance.now() - this.lastNote;
+        const max = 500;
+
+        this.ctx.beginPath();
+        this.ctx.arc(3, 6, 3, 0, 2 * Math.PI, false);
+        this.ctx.fillStyle = `rgba(255,255,255,${(1 - (elapsed / max))})`;
+        this.ctx.fill();
+        this.ctx.closePath();
+    }
+
+    loop = () => {
+        this.draw();
+        requestAnimationFrame(this.loop);
     }
 
     // Util Functions
