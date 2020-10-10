@@ -26,7 +26,7 @@ export default class Mixer {
 
     createEffectElement(label) {
         this[`${label}El`] = document.createElement('div');
-        this[`${label}El`].className = label;
+        this[`${label}El`].className = `effect ${label}`;
         this[`${label}Label`] = document.createElement('span');
         this[`${label}Label`].className = 'label';
         this[`${label}Value`] = document.createElement('span');
