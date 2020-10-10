@@ -9,11 +9,11 @@ export default function Listener(aeronaut) {
 
     this.server.on('listening', () => {
         const address = this.server.address();
-        console.log(`Server listening for UDP: ${address.address}:${address.port}`);
+        console.info(`Server listening for UDP: ${address.address}:${address.port}`);
     });
 
     this.server.on('error', (err) => {
-        console.log(`Server error:\n${err.stack}`);
+        console.info(`Server error:\n${err.stack}`);
         server.close();
     });
 

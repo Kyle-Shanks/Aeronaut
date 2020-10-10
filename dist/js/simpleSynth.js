@@ -1,7 +1,6 @@
 import * as Nodes from './nodes/index.js';
 import { clamp, noteToFreq } from './util.js';
 
-const canvasUnit = 16;
 const WAVENAMES = ['si', 'tr', 'sq', 'sw'];
 const WAVEFORMS = ['sine', 'triangle', 'square', 'sawtooth'];
 
@@ -14,26 +13,19 @@ export default class SimpleSynth {
         this.el.className = 'channel';
         this.cidEl = document.createElement('span');
         this.cidEl.className = `cid`;
+        this.cidEl.innerHTML = id.toString(16);
         this.envEl = document.createElement('span');
         this.envEl.className = `env`;
         this.oscEl = document.createElement('span');
         this.oscEl.className = `osc`;
 
         this.canvas = document.createElement('canvas');
-        this.canvas.width = canvasUnit * 2;
-        this.canvas.height = canvasUnit * 2;
-        this.canvas.style.width = `${canvasUnit}px`;
-        this.canvas.style.height = `${canvasUnit}px`;
-
+        this.canvas.width = 32;
+        this.canvas.height = 32;
         this.ctx = this.canvas.getContext('2d');
-        this.ctx.lineJoin = 'round';
-        this.ctx.lineWidth = 2;
-        this.ctx.strokeStyle = '#fff';
 
         this.lastCnvUpdate = null;
         this.lastNote = null;
-
-        this.cidEl.innerHTML = id.toString(16);
 
         this.el.appendChild(this.cidEl);
         this.el.appendChild(this.envEl);
@@ -68,13 +60,10 @@ export default class SimpleSynth {
     }
 
     start() {
-        this.updateAllEl();
-        this.loop();
+        setTimeout(() => { this.updateAllEl(); this.loop(); }, 500);
     }
 
-    connect(destination) {
-        this.volume.connect(destination);
-    }
+    connect(destination) { this.volume.connect(destination); }
 
     // Display Update Functions
     updateAllEl() {
@@ -84,7 +73,8 @@ export default class SimpleSynth {
     updateEnvEl() {
         this.setContent(
             this.envEl,
-            `${this.valToHex(this.gainEnv.a)}${this.valToHex(this.gainEnv.d)}${this.valToHex(this.gainEnv.s)}${this.valToHex(this.gainEnv.r)}`
+            `${this.valToHex(this.gainEnv.a)}${this.valToHex(this.gainEnv.d)}`
+            + `${this.valToHex(this.gainEnv.s)}${this.valToHex(this.gainEnv.r)}`
         );
     }
     updateOscEl() {
@@ -206,7 +196,7 @@ export default class SimpleSynth {
     draw() {
         if (this.lastCnvUpdate && performance.now() - this.lastCnvUpdate < 30) return;
 
-        this.ctx.clearRect(0, 0, canvasUnit * 2, canvasUnit * 2);
+        this.ctx.clearRect(0, 0, 32, 32);
         this.drawActivity();
         this.lastCnvUpdate = performance.now();
     }

@@ -20,9 +20,9 @@ app.on('ready', () => {
 
     app.win = new BrowserWindow({
         width: 360,
-        height: 174,
-        minWidth: 272,
-        minHeight: 174,
+        height: 190,
+        minWidth: 334,
+        minHeight: 190,
         backgroundColor: '#000',
         icon: { darwin: 'icon.icns', linux: 'icon.png', win32: 'icon.ico' }[process.platform] || 'icon.ico',
         resizable: true,

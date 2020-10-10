@@ -2,23 +2,24 @@
     box-sizing: border-box;
 }
 body {
-    padding: 2rem;
     transition: none;
     background-color: #000;
     color: #fff;
     font-family: 'source_code_pro_regular', monospace;
+    font-size: 1rem;
 }
 
 input {
     background: transparent;
     color: #fff;
     font-family: 'source_code_pro_regular', monospace;
+    font-size: 1rem;
     outline: none;
     border: none;
 }
 
 #drag {
-    position: absolute;
+    position: fixed;
     z-index: 10;
     top: 0;
     left: 0;
@@ -28,27 +29,49 @@ input {
 }
 
 /* Aeronaut */
-#aeronaut { display: block; position: relative; }
+#aeronaut {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    min-width: 270px;
+    animation: fadeIn 0.4s 0.5s ease-out forwards;
+    opacity: 0;
+}
+@keyframes fadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+}
 
 /* Mixer */
 #mixer {
-    display: block;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
     position: relative;
     line-height: 1rem;
     text-transform: uppercase;
-    min-width: 240px;
 }
 
-#mixer > .channel { position: relative; display: block; height: 1rem; padding: 0rem 0.25rem; }
-#mixer > .channel > span { padding-right: 0.25rem; }
-#mixer > .channel > .cid { color: #444; }
-#mixer > .channel > canvas { position: relative; display: inline-block; vertical-align: middle; }
+#mixer .group { width: 105px; }
+#mixer .group.master { width: 50px; }
+
+#mixer .channel { position: relative; display: block; height: 1rem; padding: 0rem 0.25rem; }
+#mixer .channel > span { padding-right: 0.25rem; }
+#mixer .channel .cid { color: #444; }
+#mixer .channel canvas {
+    position: relative;
+    display: inline-block;
+    vertical-align: middle;
+    height: 16px;
+    width: 16px;
+}
 
 /* Commander */
 #commander { display: block; position: relative; }
 
 #commander input {
-    width: calc(100vw - 4rem);
+    width: 100%;
     margin-top: 1.5rem;
     padding: 0.25rem 1rem 0 0.5rem;
     border-top: 1px solid #fff;

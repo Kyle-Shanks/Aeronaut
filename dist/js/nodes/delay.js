@@ -17,6 +17,8 @@ class Delay {
         this.feedbackGain.connect(this.delayNode);
 
         this.maxDelayTime = 1;
+
+        this.setAmount(0);
     }
 
     connect = destination => {
@@ -33,6 +35,7 @@ class Delay {
 
     // Getters
     getNode = () => [this.dryGain.getNode(), this.tone.getNode()];
+    getAmount = () => this.wetGain.getGain();
 
     // Setters
     setAmount = val => {

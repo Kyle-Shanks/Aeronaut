@@ -16,7 +16,7 @@ export default class Recorder {
     }
 
     install(host) {
-        console.log('Recorder', 'Installing..');
+        console.info('Recorder', 'Installing..');
 
         this.hook = this.AC.createMediaStreamDestination();
         this.recorder = new MediaRecorder(this.hook.stream);
@@ -34,7 +34,7 @@ export default class Recorder {
     start() {
         if (this.isRecording) return;
 
-        console.log('Recorder', 'Starting..');
+        console.info('Recorder', 'Starting..');
         this.chunks = [];
         this.isRecording = true;
         this.recorder.start();
@@ -44,7 +44,7 @@ export default class Recorder {
     stop() {
         if (!this.isRecording) return;
 
-        console.log('Recorder', 'Stopping..');
+        console.info('Recorder', 'Stopping..');
         this.isRecording = false;
         this.recorder.stop();
         this.el.className = '';
@@ -70,7 +70,7 @@ export default class Recorder {
             const buffer = new Buffer.from(reader.result);
             fs.writeFile(path, buffer, {}, (err, res) => {
                 if (err) { console.error(err); return; }
-                console.log('Recorder', 'Export complete.');
+                console.info('Recorder', 'Export complete.');
             })
         }
         reader.readAsArrayBuffer(blob);

@@ -6,7 +6,6 @@ class Filter {
 
         this.node.type = 'lowpass';
         this.maxFreq = 11000;
-        this.maxQ = 10;
     }
 
     connect = (destination) => {
@@ -19,6 +18,8 @@ class Filter {
 
     // Getters
     getNode = () => this.node;
+    getType = () => this.node.type;
+    getFreq = () => this.node.frequency.value;
 
     // Setters
     setType = type => {
@@ -30,18 +31,6 @@ class Filter {
         time
             ? this.node.frequency.setTargetAtTime(freq, this.AC.currentTime, time)
             : this.node.frequency.setValueAtTime(freq, this.AC.currentTime);
-    }
-    setQ = q => {
-        if (q < 0 || q > this.maxQ) return false;
-        this.node.Q.setValueAtTime(q, this.AC.currentTime);
-    }
-    setGain = val => {
-        this.node.gain.setValueAtTime(val, this.AC.currentTime);
-    }
-    setDetune = (val, time = 0) => {
-        time
-            ? this.node.detune.setTargetAtTime(val, this.AC.currentTime, time)
-            : this.node.detune.setValueAtTime(val, this.AC.currentTime);
     }
 }
 

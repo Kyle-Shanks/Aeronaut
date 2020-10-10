@@ -13,6 +13,8 @@ class BitCrusher {
         this.setBitDepth(8);
 
         this.node.connect(this.wetGain.getNode());
+
+        this.setAmount(0);
     }
 
     connect = destination => {
@@ -29,6 +31,8 @@ class BitCrusher {
 
     // Getters
     getNode = () => [this.dryGain.getNode(), this.node];
+    getBitDepth = () => this.node.bits;
+    getAmount = () => this.wetGain.getGain();
 
     // Setters
     setBitDepth = bitDepth => {

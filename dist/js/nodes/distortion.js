@@ -28,6 +28,8 @@ class Distortion {
 
         this.distortion = 0;
         this.maxDistortion = 30;
+
+        this.setAmount(0);
     }
 
     connect = destination => {
@@ -44,6 +46,8 @@ class Distortion {
 
     // Getters
     getNode = () => [this.dryGain.getNode(), this.node];
+    getDistortion = () => this.distortion;
+    getAmount = () => this.wetGain.getGain();
 
     // Setters
     setDistortion = val => {
