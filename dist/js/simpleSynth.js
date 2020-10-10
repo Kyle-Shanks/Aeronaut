@@ -18,6 +18,8 @@ export default class SimpleSynth {
         this.envEl.className = `env`;
         this.oscEl = document.createElement('span');
         this.oscEl.className = `osc`;
+        this.volEl = document.createElement('span');
+        this.volEl.className = `vol`;
 
         this.canvas = document.createElement('canvas');
         this.canvas.width = 32;
@@ -30,11 +32,12 @@ export default class SimpleSynth {
         this.el.appendChild(this.cidEl);
         this.el.appendChild(this.envEl);
         this.el.appendChild(this.oscEl);
+        this.el.appendChild(this.volEl);
         this.el.appendChild(this.canvas);
 
-        this.volume = new Nodes.Gain(this.AC); // Volume
-        this.gain = new Nodes.Gain(this.AC); // ADSR Gain
         this.osc = new Nodes.Oscillator(this.AC);
+        this.gain = new Nodes.Gain(this.AC); // ADSR Gain
+        this.volume = new Nodes.Gain(this.AC); // Volume
 
         this.gainEnv = {
             a: 0.01,
@@ -69,18 +72,23 @@ export default class SimpleSynth {
     updateAllEl() {
         this.updateEnvEl();
         this.updateOscEl();
+        this.updateVolEl();
     }
-    updateEnvEl() {
+    updateEnvEl = () => {
         this.setContent(
             this.envEl,
             `${this.valToHex(this.gainEnv.a)}${this.valToHex(this.gainEnv.d)}`
             + `${this.valToHex(this.gainEnv.s)}${this.valToHex(this.gainEnv.r)}`
         );
     }
-    updateOscEl() {
+    updateOscEl = () => {
         const waveform = this.osc.getType();
         const wavename = WAVENAMES[WAVEFORMS.indexOf(waveform)];
         this.setContent(this.oscEl, wavename);
+    }
+    updateVolEl = () => {
+        const val = Math.floor(this.volume.getGain() * 255).toString(16);
+        this.setContent(this.volEl, val.length === 2 ? val : `0${val}`);
     }
 
     run(msg) {
@@ -90,10 +98,12 @@ export default class SimpleSynth {
         switch (data.cmd) {
             case 'osc': this.setOscWaveform(data); break;
             case 'env': this.setGainEnv(data); break;
+            case 'vol': this.setVolume(data); break;
             default: this.noteOn(data);
         }
     }
 
+    // Parse Functions
     parse(msg) {
         const cmd = msg.slice(0, 3).toLowerCase();
         const val = msg.slice(3).toLowerCase();
@@ -101,12 +111,13 @@ export default class SimpleSynth {
         switch (cmd) {
             case 'env': return this.parseEnv(val);
             case 'osc': return this.parseOsc(val);
+            case 'vol': return this.parseVol(val);
+            // TODO: Add random env and osc functions
             // case 'ren': return { isRen: true };
             // case 'ros': return { isRos: true };
             default: return this.parseNote(msg);
         }
     }
-
     parseNote(args) {
         if (args.length < 2) { console.warn(`Misformatted note`); return; }
 
@@ -119,7 +130,6 @@ export default class SimpleSynth {
 
         return { isNote: true, freq, length, velocity };
     }
-
     parseEnv(args) {
         if (args.length < 1) { console.warn(`Misformatted env`); return; }
 
@@ -129,26 +139,33 @@ export default class SimpleSynth {
         const release = args.length > 3 ? parseInt(args.slice(3, 4), 16) / 15 : null
         return { cmd: 'env', attack, decay, sustain, release, }
     }
-
     parseOsc(args) {
         if (args.length !== 2) { console.warn(`Misformatted osc`); return; }
         const index = WAVENAMES.indexOf(args);
         if (index == -1) return;
         return { cmd: 'osc', waveform: WAVEFORMS[index] };
     }
+    parseVol(args) {
+        if (args.length > 2 || /[g-z]/.test(args)) { console.warn(`Misformatted vol`); return; }
+        return { cmd: 'vol', val: parseInt(args, 16) / 255 };
+    }
 
+    // Param Update Functions
     setGainEnv(data) {
         if (!isNaN(data.attack)) this.gainEnv.a = clamp(data.attack, 0.01, 1);
         if (!isNaN(data.decay)) this.gainEnv.d = clamp(data.decay, 0.01, 1);
         if (!isNaN(data.sustain)) this.gainEnv.s = clamp(data.sustain, 0, 1);
         if (!isNaN(data.release)) this.gainEnv.r = clamp(data.release, 0.01, 1);
 
-        this.updateEnvEl();
+        setTimeout(this.updateEnvEl, 50);
     }
-
     setOscWaveform(data) {
         this.osc.setType(data.waveform);
-        this.updateOscEl();
+        setTimeout(this.updateOscEl, 50);
+    }
+    setVolume(data) {
+        this.volume.setGain(data.val);
+        setTimeout(this.updateVolEl, 50);
     }
 
     // Note trigger methods

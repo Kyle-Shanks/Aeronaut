@@ -32,7 +32,7 @@ input {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    min-width: 248px;
+    min-width: 296px;
     animation: fadeIn 0.4s 0.5s ease-out forwards;
     opacity: 0;
 }
@@ -52,7 +52,7 @@ input {
     margin-bottom: 1rem;
 }
 
-#mixer .group { width: 96px; }
+#mixer .group { width: 120px; }
 #mixer .group.master { width: 56px; }
 
 #mixer .channel { position: relative; display: block; height: 1rem; }

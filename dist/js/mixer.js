@@ -131,25 +131,25 @@ export default class Mixer {
 
     // Effect Functions
     updateMasterVolume(args) {
-        if (args.length > 2 || /[g-z]/.test(args)) return;
+        if (args.length > 2 || /[g-z]/.test(args)) { console.warn(`Misformatted vol`); return; }
         this.masterVolume.setGain(parseInt(args, 16) / 255);
         setTimeout(this.updateVolEl, 50);
     }
 
     updateDistortion(args) {
-        if (args.length > 2 || /[g-z]/.test(args)) return;
+        if (args.length > 2 || /[g-z]/.test(args)) { console.warn(`Misformatted dis`); return; }
         this.effects.distortion.setAmount(parseInt(args, 16) / 255);
         setTimeout(this.updateDisEl, 50);
     }
 
     updateReverb(args) {
-        if (args.length > 2 || /[g-z]/.test(args)) return;
+        if (args.length > 2 || /[g-z]/.test(args)) { console.warn(`Misformatted rev`); return; }
         this.effects.reverb.setAmount(parseInt(args, 16) / 255);
         setTimeout(this.updateRevEl, 50);
     }
 
     updateBitcrusher(args) {
-        if (args.length > 2 || /[g-z]/.test(args)) return;
+        if (args.length > 2 || /[g-z]/.test(args)) { console.warn(`Misformatted bit`); return; }
         const bitDepth = parseInt(args.slice(0,1), 16);
         const amount = parseInt(args.slice(1), 16);
 
@@ -159,7 +159,7 @@ export default class Mixer {
     }
 
     updateFilter(args) {
-        if (args.length !== 2 || /[g-z]/.test(args)) return;
+        if (args.length !== 2 || /[g-z]/.test(args)) { console.warn(`Misformatted fil`); return; }
         const val = parseInt(args, 16);
 
         if (val >= 128) {
