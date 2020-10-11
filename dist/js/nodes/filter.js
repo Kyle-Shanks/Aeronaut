@@ -6,6 +6,8 @@ class Filter {
 
         this.node.type = 'lowpass';
         this.maxFreq = 11000;
+
+        this.setFreq(this.maxFreq);
     }
 
     connect = (destination) => {

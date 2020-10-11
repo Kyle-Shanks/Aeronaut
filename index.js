@@ -19,9 +19,9 @@ app.on('ready', () => {
     require('electron').protocol.registerBufferProtocol('js', protocolHandler);
 
     app.win = new BrowserWindow({
-        width: 360,
+        width: 364,
         height: 180,
-        minWidth: 328,
+        minWidth: 332,
         minHeight: 148,
         backgroundColor: '#000',
         icon: { darwin: 'icon.icns', linux: 'icon.png', win32: 'icon.ico' }[process.platform] || 'icon.ico',

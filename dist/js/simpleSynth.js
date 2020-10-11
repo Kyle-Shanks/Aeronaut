@@ -106,12 +106,12 @@ export default class SimpleSynth {
     // Parse Functions
     parse(msg) {
         const cmd = msg.slice(0, 3).toLowerCase();
-        const val = msg.slice(3).toLowerCase();
+        const args = msg.slice(3).toLowerCase();
 
         switch (cmd) {
-            case 'env': return this.parseEnv(val);
-            case 'osc': return this.parseOsc(val);
-            case 'vol': return this.parseVol(val);
+            case 'env': return this.parseEnv(args);
+            case 'osc': return this.parseOsc(args);
+            case 'vol': return this.parseVol(args);
             // TODO: Add random env and osc functions
             // case 'ren': return { isRen: true };
             // case 'ros': return { isRos: true };

@@ -1,5 +1,6 @@
 import * as Nodes from './nodes/index.js';
 import SimpleSynth from './simpleSynth.js';
+import Synth from './synth.js';
 
 export default class Mixer {
     constructor(aeronaut) {
@@ -12,9 +13,9 @@ export default class Mixer {
 
         // Effect Elements
         this.createEffectElement('dis');
-        this.createEffectElement('rev');
         this.createEffectElement('bit');
         this.createEffectElement('fil');
+        this.createEffectElement('rev');
         this.createEffectElement('vol');
 
         this.masterVolume = new Nodes.Gain(this.AC); // Master Volume
@@ -47,26 +48,26 @@ export default class Mixer {
         this.channels[2] = new SimpleSynth(this.AC, 2);
         this.channels[3] = new SimpleSynth(this.AC, 3);
 
-        this.channels[4] = new SimpleSynth(this.AC, 4);
-        this.channels[5] = new SimpleSynth(this.AC, 5);
-        this.channels[6] = new SimpleSynth(this.AC, 6);
-        this.channels[7] = new SimpleSynth(this.AC, 7);
+        this.channels[4] = new Synth(this.AC, 4);
+        this.channels[5] = new Synth(this.AC, 5);
+        this.channels[6] = new Synth(this.AC, 6);
+        this.channels[7] = new Synth(this.AC, 7);
 
         // Create all master effects
         this.effects.distortion = new Nodes.Distortion(this.AC);
-        this.effects.reverb = new Nodes.Reverb(this.AC);
         this.effects.bitcrusher = new Nodes.BitCrusher(this.AC);
         this.effects.filter = new Nodes.Filter(this.AC);
+        this.effects.reverb = new Nodes.Reverb(this.AC);
 
         this.effects.distortion.setDistortion(30);
 
         // Connect all channels
         for (let id in this.channels) this.channels[id].connect(this.effects.distortion.getNode());
 
-        this.effects.distortion.connect(this.effects.reverb.getNode());
-        this.effects.reverb.connect(this.effects.bitcrusher.getNode());
+        this.effects.distortion.connect(this.effects.bitcrusher.getNode());
         this.effects.bitcrusher.connect(this.effects.filter.getNode());
-        this.effects.filter.connect(this.masterVolume.getNode());
+        this.effects.filter.connect(this.effects.reverb.getNode());
+        this.effects.reverb.connect(this.masterVolume.getNode());
 
         this.masterVolume.connect(this.AC.destination);
 
@@ -130,25 +131,25 @@ export default class Mixer {
     }
 
     // Effect Functions
-    updateMasterVolume(args) {
+    setMasterVolume(args) {
         if (args.length > 2 || /[g-z]/.test(args)) { console.warn(`Misformatted vol`); return; }
         this.masterVolume.setGain(parseInt(args, 16) / 255);
         setTimeout(this.updateVolEl, 50);
     }
 
-    updateDistortion(args) {
+    setDistortion(args) {
         if (args.length > 2 || /[g-z]/.test(args)) { console.warn(`Misformatted dis`); return; }
         this.effects.distortion.setAmount(parseInt(args, 16) / 255);
         setTimeout(this.updateDisEl, 50);
     }
 
-    updateReverb(args) {
+    setReverb(args) {
         if (args.length > 2 || /[g-z]/.test(args)) { console.warn(`Misformatted rev`); return; }
         this.effects.reverb.setAmount(parseInt(args, 16) / 255);
         setTimeout(this.updateRevEl, 50);
     }
 
-    updateBitcrusher(args) {
+    setBitcrusher(args) {
         if (args.length > 2 || /[g-z]/.test(args)) { console.warn(`Misformatted bit`); return; }
         const bitDepth = parseInt(args.slice(0,1), 16);
         const amount = parseInt(args.slice(1), 16);
@@ -158,22 +159,14 @@ export default class Mixer {
         setTimeout(this.updateBitEl, 50);
     }
 
-    updateFilter(args) {
-        if (args.length !== 2 || /[g-z]/.test(args)) { console.warn(`Misformatted fil`); return; }
+    setFilter(args) {
+        if (args.length > 2 || /[g-z]/.test(args)) { console.warn(`Misformatted fil`); return; }
         const val = parseInt(args, 16);
+        const freq = this.effects.filter.maxFreq * this.attenuate((val % 128), 127);;
+        const waveform = val >= 128 ? 'highpass' : 'lowpass';
 
-        if (val >= 128) {
-            // Highpass
-            const freq = this.effects.filter.maxFreq * this.attenuate(val - 128, 127);
-            this.effects.filter.setType('highpass');
-            this.effects.filter.setFreq(freq);
-        } else {
-            // Lowpass
-            const freq = this.effects.filter.maxFreq * this.attenuate(val, 127);
-            this.effects.filter.setType('lowpass');
-            this.effects.filter.setFreq(freq);
-        }
-
+        this.effects.filter.setType(waveform);
+        this.effects.filter.setFreq(freq);
         setTimeout(this.updateFilEl, 50);
     }
 
@@ -195,11 +188,11 @@ export default class Mixer {
             const cmd = msg.slice(0,3).toLowerCase();
             const args = msg.slice(3).toLowerCase();
 
-            if (cmd === 'dis') return this.updateDistortion(args);
-            else if (cmd === 'rev') return this.updateReverb(args);
-            else if (cmd === 'bit') return this.updateBitcrusher(args);
-            else if (cmd === 'fil') return this.updateFilter(args);
-            else if (cmd === 'vol') return this.updateMasterVolume(args);
+            if (cmd === 'dis') return this.setDistortion(args);
+            else if (cmd === 'rev') return this.setReverb(args);
+            else if (cmd === 'bit') return this.setBitcrusher(args);
+            else if (cmd === 'fil') return this.setFilter(args);
+            else if (cmd === 'vol') return this.setMasterVolume(args);
         }
 
         // Channel check
