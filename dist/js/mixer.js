@@ -16,6 +16,7 @@ export default class Mixer {
         this.createEffectElement('bit');
         this.createEffectElement('fil');
         this.createEffectElement('rev');
+        this.createEffectElement('com');
         this.createEffectElement('vol');
 
         this.masterVolume = new Nodes.Gain(this.AC); // Master Volume
@@ -58,6 +59,7 @@ export default class Mixer {
         this.effects.bitcrusher = new Nodes.BitCrusher(this.AC);
         this.effects.filter = new Nodes.Filter(this.AC);
         this.effects.reverb = new Nodes.Reverb(this.AC);
+        this.effects.compressor = new Nodes.Compressor(this.AC);
 
         // Connect all channels
         for (let id in this.channels) this.channels[id].connect(this.effects.distortion.getNode());
@@ -65,7 +67,8 @@ export default class Mixer {
         this.effects.distortion.connect(this.effects.bitcrusher.getNode());
         this.effects.bitcrusher.connect(this.effects.filter.getNode());
         this.effects.filter.connect(this.effects.reverb.getNode());
-        this.effects.reverb.connect(this.masterVolume.getNode());
+        this.effects.reverb.connect(this.effects.compressor.getNode());
+        this.effects.compressor.connect(this.masterVolume.getNode());
 
         this.masterVolume.connect(this.AC.destination);
 
@@ -127,6 +130,11 @@ export default class Mixer {
             : Math.round(val).toString(16);
         this.setContent(this.filValue, hex.length === 2 ? hex : `0${hex}`);
     }
+    updateComEl = () => {
+        const threshold = (this.effects.compressor.getThreshold() / -4).toString(16);
+        const ratio = (this.effects.compressor.getRatio() - 1).toString(16);
+        this.setContent(this.comValue, `${threshold}${ratio}`);
+    }
 
     // Effect Functions
     setMasterVolume(args) {
@@ -134,19 +142,16 @@ export default class Mixer {
         this.masterVolume.setGain(parseInt(args, 16) / 255);
         setTimeout(this.updateVolEl, 50);
     }
-
     setDistortion(args) {
         if (args.length > 2 || /[g-z]/.test(args)) { console.warn(`Misformatted dis`); return; }
         this.effects.distortion.setAmount(parseInt(args, 16) / 255);
         setTimeout(this.updateDisEl, 50);
     }
-
     setReverb(args) {
         if (args.length > 2 || /[g-z]/.test(args)) { console.warn(`Misformatted rev`); return; }
         this.effects.reverb.setAmount(parseInt(args, 16) / 255);
         setTimeout(this.updateRevEl, 50);
     }
-
     setBitcrusher(args) {
         if (args.length > 2 || /[g-z]/.test(args)) { console.warn(`Misformatted bit`); return; }
         const bitDepth = parseInt(args.slice(0,1), 16);
@@ -156,7 +161,6 @@ export default class Mixer {
         if (!isNaN(amount)) this.effects.bitcrusher.setAmount(amount / 15);
         setTimeout(this.updateBitEl, 50);
     }
-
     setFilter(args) {
         if (args.length > 2 || /[g-z]/.test(args)) { console.warn(`Misformatted fil`); return; }
         const val = parseInt(args, 16);
@@ -166,6 +170,15 @@ export default class Mixer {
         this.effects.filter.setType(waveform);
         this.effects.filter.setFreq(freq);
         setTimeout(this.updateFilEl, 50);
+    }
+    setCompressor(args) {
+        if (args.length > 2 || /[g-z]/.test(args)) { console.warn(`Misformatted com`); return; }
+        const threshold = parseInt(args.slice(0, 1), 16);
+        const ratio = parseInt(args.slice(1), 16);
+
+        if (!isNaN(threshold)) this.effects.compressor.setThreshold(threshold * -4);
+        if (!isNaN(ratio)) this.effects.compressor.setRatio(ratio + 1);
+        setTimeout(this.updateComEl, 50);
     }
 
     // Run Command Function
@@ -190,6 +203,7 @@ export default class Mixer {
             else if (cmd === 'rev') return this.setReverb(args);
             else if (cmd === 'bit') return this.setBitcrusher(args);
             else if (cmd === 'fil') return this.setFilter(args);
+            else if (cmd === 'com') return this.setCompressor(args);
             else if (cmd === 'vol') return this.setMasterVolume(args);
         }
 
@@ -208,7 +222,7 @@ export default class Mixer {
             + '5DIS00;5REV0;5DEL00F0;5FIL80;5PAN80;5VIB00;'
             + '6DIS00;6REV0;6DEL00F0;6FIL80;6PAN80;6VIB00;'
             + '7DIS00;7REV0;7DEL00F0;7FIL80;7PAN80;7VIB00;'
-            + 'DIS00;REV00;BIT70;FIL80;VOLBF'
+            + 'DIS00;REV00;BIT70;FIL80;COM80;VOLBF'
         );
     }
 

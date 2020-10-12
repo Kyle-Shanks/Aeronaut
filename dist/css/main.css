@@ -32,7 +32,7 @@ input {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    min-width: 300px;
+    min-width: 294px;
     animation: fadeIn 0.4s 0.5s ease-out forwards;
     opacity: 0;
 }
@@ -53,7 +53,7 @@ input {
 }
 
 #mixer .group { width: 120px; }
-#mixer .group.master { width: 60px; }
+#mixer .group.master { width: 54px; }
 
 #mixer .channel {
     position: relative;
@@ -75,10 +75,9 @@ input {
     position: relative;
     display: block;
     height: 1rem;
-    width: 60px;
+    width: 54px;
 }
-#mixer .effect > span { padding-right: 0.25rem; }
-#mixer .effect .label { color: #444; }
+#mixer .effect .label { color: #444; padding-right: 0.25rem; }
 
 /* Commander */
 #commander { display: block; position: relative; }
