@@ -8,19 +8,12 @@ export default class Recorder {
         this.el.textContent = '•';
 
         this.AC = aeronaut.AC;
+        this.aeronautRef = aeronaut;
 
         this.hook = null;
         this.recorder = null;
         this.chunks = [];
         this.isRecording = false;
-
-        window.addEventListener('keydown', (e) => {
-            if (e.key === '`') {
-                e.stopPropagation();
-                e.preventDefault();
-                this.toggle();
-            }
-        });
     }
 
     install(host) {
@@ -28,6 +21,7 @@ export default class Recorder {
 
         this.hook = this.AC.createMediaStreamDestination();
         this.recorder = new MediaRecorder(this.hook.stream);
+        this.aeronautRef.mixer.masterVolume.connect(this.hook);
 
         this.recorder.onstop = (evt) => {
             const blob = new Blob(this.chunks, { type: 'audio/opus; codecs=opus' });
@@ -62,10 +56,9 @@ export default class Recorder {
     save(blob) {
         dialog.showSaveDialog(
             {
-                filters: [{ name: 'Audio File', extensions: ['opus'] }]
+                filters: [{ name: 'Audio File', extensions: ['opus'] }],
             }
         ).then((path) => {
-            console.log(path);
             if (path === undefined || path.canceled) return;
             this.write(path, blob);
         });
