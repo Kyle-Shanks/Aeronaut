@@ -1,9 +1,5 @@
 import * as Nodes from './nodes/index.js';
 import SimpleSynth from './simpleSynth.js';
-import { clamp, noteToFreq } from './util.js';
-
-const WAVENAMES = ['si', 'tr', 'sq', 'sw'];
-const WAVEFORMS = ['sine', 'triangle', 'square', 'sawtooth'];
 
 export default class Synth extends SimpleSynth {
     constructor(AC, id) {
@@ -36,7 +32,6 @@ export default class Synth extends SimpleSynth {
 
         host.appendChild(this.el);
     }
-
 
     // Display Update Functions
     updateAllEl() {
@@ -157,7 +152,5 @@ export default class Synth extends SimpleSynth {
     }
 
     // Util Functions
-    valToHex(num) { return Math.floor(num * 15).toString(16); }
-    setContent(el, ct) { if (el.innerHTML !== ct) el.innerHTML = ct; }
     attenuate(val, base = 16) { return Math.pow(val, 2) / Math.pow(base, 2); }
 }

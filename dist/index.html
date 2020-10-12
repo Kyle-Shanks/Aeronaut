@@ -13,8 +13,39 @@
         <div id="drag"></div>
         <script type="module">
             import Aeronaut from "./js/aeronaut.js";
+            import Controller from "./js/controller.js";
+            const { app } = require('@electron/remote');
 
             const aeronaut = new Aeronaut();
+            const controller = new Controller();
+
+            controller.add("default", "*", "Fullscreen", () => { app.toggleFullscreen() }, "CmdOrCtrl+Enter");
+            controller.add("default", "*", "Hide", () => { app.toggleVisible() }, "CmdOrCtrl+H");
+            controller.add("default", "*", "Minimize", () => { app.toggleMinimized() }, "CmdOrCtrl+M");
+            controller.add("default", "*", "Inspect", () => { app.inspect() }, "CmdOrCtrl+.");
+            controller.add("default", "*", "Reset", () => { aeronaut.mixer.reset() }, "CmdOrCtrl+Backspace");
+            controller.add("default", "*", "Quit", () => { app.exit() }, "CmdOrCtrl+Q");
+
+            controller.add("default", "File", "Record", () => { aeronaut.recorder.toggle() }, "CmdOrCtrl+R");
+            controller.add("default", "File", "Stop Recording", () => { aeronaut.recorder.stop() }, "Escape");
+
+            controller.addRole('default', 'Edit', 'undo');
+            controller.addRole('default', 'Edit', 'redo');
+            controller.addRole('default', 'Edit', 'cut');
+            controller.addRole('default', 'Edit', 'copy');
+            controller.addRole('default', 'Edit', 'paste');
+            controller.addRole('default', 'Edit', 'delete');
+            controller.addRole('default', 'Edit', 'selectall');
+
+            controller.add("default", "View", "Zoom In", () => { aeronaut.modZoom(0.25) }, "CmdOrCtrl+=");
+            controller.add("default", "View", "Zoom Out", () => { aeronaut.modZoom(-0.25) }, "CmdOrCtrl+-");
+            controller.add("default", "View", "Zoom Reset", () => { aeronaut.modZoom(1, true) }, "CmdOrCtrl+0");
+
+            controller.add('default', 'About', 'Repo', () => { require('electron').shell.openExternal('https://github.com/Kyle-Shanks') });
+            controller.add('default', 'About', 'Inspiration', () => { require('electron').shell.openExternal('https://github.com/hundredrabbits/Pilot') });
+
+            controller.commit();
+
             aeronaut.install(document.body);
             aeronaut.start();
         </script>

@@ -59,8 +59,6 @@ export default class Mixer {
         this.effects.filter = new Nodes.Filter(this.AC);
         this.effects.reverb = new Nodes.Reverb(this.AC);
 
-        this.effects.distortion.setDistortion(30);
-
         // Connect all channels
         for (let id in this.channels) this.channels[id].connect(this.effects.distortion.getNode());
 
@@ -205,6 +203,11 @@ export default class Mixer {
     reset = () => {
         this.run(
             '0ENV0600;0OSCSI;1ENV0600;1OSCSI;2ENV0600;2OSCSI;3ENV0600;3OSCSI;'
+            + '4ENV0600;4OSCSI;5ENV0600;5OSCSI;6ENV0600;6OSCSI;7ENV0600;7OSCSI;'
+            + '4DIS00;4REV0;4DEL00F0;4FIL80;4PAN80;4VIB00;'
+            + '5DIS00;5REV0;5DEL00F0;5FIL80;5PAN80;5VIB00;'
+            + '6DIS00;6REV0;6DEL00F0;6FIL80;6PAN80;6VIB00;'
+            + '7DIS00;7REV0;7DEL00F0;7FIL80;7PAN80;7VIB00;'
             + 'DIS00;REV00;BIT70;FIL80;VOLBF'
         );
     }

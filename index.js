@@ -1,6 +1,7 @@
 const { app, BrowserWindow, Menu } = require('electron');
 const path = require('path');
 
+require('@electron/remote/main').initialize();
 require('electron').protocol.registerSchemesAsPrivileged([
     { scheme: 'js', privileges: { standard: true, secure: true } }
 ]);
@@ -29,7 +30,12 @@ app.on('ready', () => {
         frame: process.platform !== 'darwin',
         skipTaskbar: process.platform === 'darwin',
         autoHideMenuBar: process.platform === 'darwin',
-        webPreferences: { zoomFactor: 1.0, nodeIntegration: true, backgroundThrottling: false },
+        webPreferences: {
+            zoomFactor: 1.0,
+            nodeIntegration: true,
+            backgroundThrottling: false,
+            enableRemoteModule: true,
+        },
     });
 
     app.win.loadFile('dist/index.html');
@@ -38,24 +44,31 @@ app.on('ready', () => {
 
     app.on('window-all-closed', () => { if (process.platform !== 'darwin') app.quit(); });
     app.on('activate', () => { app.win === null ? createWindow() : app.win.show(); });
-})
 
-app.inspect = () => { app.win.toggleDevTools(); }
 
-app.toggleFullscreen = () => { app.win.setFullScreen(!app.win.isFullScreen()); }
+    app.inspect = () => { app.win.toggleDevTools(); }
 
-app.toggleVisible = function () {
-    if (process.platform === 'darwin') {
-        (app.win.isVisible() && !app.win.isFullScreen()) ? app.win.hide() : app.win.show();
-    } else {
+    app.toggleFullscreen = () => {
+        app.win.setFullScreen(!app.win.isFullScreen());
+    }
+
+    app.toggleVisible = function () {
+        if (process.platform === 'darwin') {
+            (app.win.isVisible() && !app.win.isFullScreen()) ? app.win.hide() : app.win.show();
+        } else {
+            app.win.isMinimized() ? app.win.restore() : app.win.minimize();
+        }
+    }
+
+    app.toggleMinimized = function () {
         app.win.isMinimized() ? app.win.restore() : app.win.minimize();
     }
-}
 
-app.injectMenu = function (menu) {
-    try {
-        Menu.setApplicationMenu(Menu.buildFromTemplate(menu));
-    } catch (err) {
-        console.warn('Cannot inject menu.');
+    app.injectMenu = function (menu) {
+        try {
+            Menu.setApplicationMenu(Menu.buildFromTemplate(menu));
+        } catch (err) {
+            console.warn('Cannot inject menu.');
+        }
     }
-}
+});

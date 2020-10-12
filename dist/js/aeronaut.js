@@ -3,6 +3,8 @@ import Mixer from './mixer.js';
 import Recorder from './recorder.js';
 import Commander from './commander.js';
 
+const { webFrame } = require('electron');
+
 export default class Aeronaut {
     constructor() {
         this.el = document.createElement('div');
@@ -36,5 +38,15 @@ export default class Aeronaut {
 
         this.mixer.start();
         this.commander.start();
+
+        const zoomFactor = Number(localStorage.getItem('zoomFactor'));
+        webFrame.setZoomFactor(zoomFactor);
+    }
+
+    modZoom(mod = 0, set = false) {
+        const currentZoomFactor = webFrame.getZoomFactor();
+        const newZoomFactor = set ? mod : currentZoomFactor + mod;
+        webFrame.setZoomFactor(newZoomFactor);
+        localStorage.setItem('zoomFactor', newZoomFactor);
     }
 }

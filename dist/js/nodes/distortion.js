@@ -29,6 +29,7 @@ class Distortion {
         this.distortion = 0;
         this.maxDistortion = 30;
 
+        this.setDistortion(this.maxDistortion);
         this.setAmount(0);
     }
 
