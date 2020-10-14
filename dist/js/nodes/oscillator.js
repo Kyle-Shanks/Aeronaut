@@ -23,6 +23,7 @@ class Oscillator {
     // Getters
     getNode = () => this.node;
     getType = () => this.node.type;
+    getFreq = () => this.node.frequency.value;
 
     // Setters
     setType = type => {

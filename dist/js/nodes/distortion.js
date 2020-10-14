@@ -1,15 +1,13 @@
 import Gain from './gain.js';
 
-const createDistCurve = (amount = 0) => {
-    const k = amount;
+const createDistCurve = (gain = 0) => {
     const n_samples = 44100;
     const curve = new Float32Array(n_samples);
     const deg = Math.PI / 180;
-    let x;
 
     for (let i = 0; i < n_samples; ++i) {
-        x = i * 2 / n_samples - 1;
-        curve[i] = (3 + k) * Math.atan(Math.sinh(x * 0.25) * 5) / (Math.PI + k * Math.abs(x));
+        const x = i * 2 / n_samples - 1;
+        curve[i] = (3 + gain) * x * 20 * deg / (Math.PI + gain * Math.abs(x));
     }
     return curve;
 };

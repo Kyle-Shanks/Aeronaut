@@ -20,6 +20,7 @@ class StereoPanner {
 
     // Getters
     getNode = () => this.node;
+    getPan = () => this.node.pan.value;
 
     // Setters
     setPan = val => {

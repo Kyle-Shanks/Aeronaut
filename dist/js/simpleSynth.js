@@ -1,5 +1,5 @@
 import * as Nodes from './nodes/index.js';
-import { clamp, noteToFreq } from './util.js';
+import { clamp, attenuate, setContent, noteToFreq } from './util.js';
 
 const WAVENAMES = ['si', 'tr', 'sq', 'sw'];
 const WAVEFORMS = ['sine', 'triangle', 'square', 'sawtooth'];
@@ -10,7 +10,7 @@ export default class SimpleSynth {
 
         this.el = document.createElement('div');
         this.el.id = `ch${id.toString(16)}`;
-        this.el.className = 'channel';
+        this.el.className = 'channel simple';
         this.cidEl = document.createElement('span');
         this.cidEl.className = `cid`;
         this.cidEl.innerHTML = id.toString(16);
@@ -47,7 +47,6 @@ export default class SimpleSynth {
         };
 
         this.timeoutIds = [];
-        this.noteHeld = null;
     }
 
     install(host) {
@@ -75,20 +74,20 @@ export default class SimpleSynth {
         this.updateVolEl();
     }
     updateEnvEl = () => {
-        this.setContent(
-            this.envEl,
-            `${this.valToHex(this.gainEnv.a)}${this.valToHex(this.gainEnv.d)}`
-            + `${this.valToHex(this.gainEnv.s)}${this.valToHex(this.gainEnv.r)}`
-        );
+        const a = Math.floor(this.gainEnv.a * 15).toString(16);
+        const d = Math.floor(this.gainEnv.d * 15).toString(16);
+        const s = Math.floor(this.gainEnv.s * 15).toString(16);
+        const r = Math.floor(this.gainEnv.r * 15).toString(16);
+        setContent(this.envEl, `${a}${d}${s}${r}`);
     }
     updateOscEl = () => {
         const waveform = this.osc.getType();
         const wavename = WAVENAMES[WAVEFORMS.indexOf(waveform)];
-        this.setContent(this.oscEl, wavename);
+        setContent(this.oscEl, wavename);
     }
     updateVolEl = () => {
         const val = Math.floor(this.volume.getGain() * 255).toString(16);
-        this.setContent(this.volEl, val.length === 2 ? val : `0${val}`);
+        setContent(this.volEl, val.length === 2 ? val : `0${val}`);
     }
 
     run(msg) {
@@ -125,7 +124,7 @@ export default class SimpleSynth {
         const note = args.slice(1, 2);
         const freq = noteToFreq(note, octave);
 
-        const velocity = args.length >= 3 ? this.attenuate(parseInt(args.slice(2, 3), 16)) : 1;
+        const velocity = args.length >= 3 ? attenuate(parseInt(args.slice(2, 3), 16)) : 1;
         const length = args.length >= 4 ? (parseInt(args.slice(3, 4), 16) / 15) : 0.125;
 
         return { isNote: true, freq, length, velocity };
@@ -171,6 +170,7 @@ export default class SimpleSynth {
     // Note trigger methods
     noteOn = (note) => {
         const { freq, velocity, length } = note;
+        if (isNaN(freq) || isNaN(velocity) || isNaN(length)) return;
         this.clearTimeouts();
 
         this.osc.setFreq(freq);
@@ -235,9 +235,4 @@ export default class SimpleSynth {
         this.draw();
         requestAnimationFrame(this.loop);
     }
-
-    // Util Functions
-    valToHex(num) { return Math.floor(num * 15).toString(16); }
-    setContent(el, ct) { if (el.innerHTML !== ct) el.innerHTML = ct; }
-    attenuate(val, base = 16) { return Math.pow(val, 2) / Math.pow(base, 2); }
 }

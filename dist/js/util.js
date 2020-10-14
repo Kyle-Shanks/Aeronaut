@@ -1,5 +1,12 @@
+// Util Functions
 export const clamp = (v, min, max) => ( v < min ? min : (v > max ? max : v) );
+export const attenuate = (val, base = 16) => Math.pow(val, 2) / Math.pow(base, 2);
+export const reverseAttenuate = (val, base = 16) => Math.sqrt(Math.pow(base, 2) * val);
 
+// Dom Functions
+export const setContent = (el, ct) => { if (el.innerHTML !== ct) el.innerHTML = ct; }
+
+// Note Functions
 const inputToNoteMap = {
     'A': 'A0',
     'a': 'a0',

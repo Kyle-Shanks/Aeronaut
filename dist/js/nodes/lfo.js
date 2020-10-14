@@ -27,6 +27,8 @@ class LFO {
     // These could potentially be used later for lfos affecting other lfos
     getNode = () => this.osc.getNode();
     getDepthNode = () => this.depth.getNode();
+    getRate = () => this.osc.getFreq();
+    getDepth = () => this.depth.getGain();
 
     // Setters
     setRate = val => {

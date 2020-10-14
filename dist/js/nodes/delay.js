@@ -19,7 +19,7 @@ class Delay {
         this.maxDelayTime = 1;
 
         this.setAmount(0);
-        this.setFeedback(0);
+        this.setFeedback(0.7);
     }
 
     connect = destination => {

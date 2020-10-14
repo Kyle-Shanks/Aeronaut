@@ -1,6 +1,7 @@
-import * as Nodes from './nodes/index.js';
 import SimpleSynth from './simpleSynth.js';
 import Synth from './synth.js';
+import * as Nodes from './nodes/index.js';
+import { attenuate, reverseAttenuate, setContent } from './util.js';
 
 export default class Mixer {
     constructor(aeronaut) {
@@ -10,14 +11,16 @@ export default class Mixer {
 
         this.masterEl = document.createElement('div');
         this.masterEl.className = 'group master';
+        this.masterEl2 = document.createElement('div');
+        this.masterEl2.className = 'group master';
 
         // Effect Elements
-        this.createEffectElement('dis');
-        this.createEffectElement('bit');
-        this.createEffectElement('fil');
-        this.createEffectElement('rev');
-        this.createEffectElement('com');
-        this.createEffectElement('vol');
+        this.createEffectElement('dis', this.masterEl);
+        this.createEffectElement('bit', this.masterEl);
+        this.createEffectElement('fil', this.masterEl);
+        this.createEffectElement('rev', this.masterEl);
+        this.createEffectElement('com', this.masterEl2);
+        this.createEffectElement('vol', this.masterEl2);
 
         this.masterVolume = new Nodes.Gain(this.AC); // Master Volume
         this.masterVolume.setGain(0.75);
@@ -26,7 +29,7 @@ export default class Mixer {
         this.effects = {};
     }
 
-    createEffectElement(label) {
+    createEffectElement(label, container) {
         this[`${label}El`] = document.createElement('div');
         this[`${label}El`].className = `effect ${label}`;
         this[`${label}Label`] = document.createElement('span');
@@ -37,22 +40,31 @@ export default class Mixer {
         this[`${label}Label`].innerHTML = label;
         this[`${label}El`].appendChild(this[`${label}Label`]);
         this[`${label}El`].appendChild(this[`${label}Value`]);
-        this.masterEl.appendChild(this[`${label}El`]);
+        container.appendChild(this[`${label}El`]);
     }
 
     install(host) {
         console.info('Mixer is installing...');
 
-        // TODO: Need to create all of the synths and connect them to the audio context
-        this.channels[0] = new SimpleSynth(this.AC, 0);
-        this.channels[1] = new SimpleSynth(this.AC, 1);
-        this.channels[2] = new SimpleSynth(this.AC, 2);
-        this.channels[3] = new SimpleSynth(this.AC, 3);
+        // Create the full synths
+        this.channels[0] = new Synth(this.AC, 0);
+        this.channels[1] = new Synth(this.AC, 1);
+        this.channels[2] = new Synth(this.AC, 2);
+        this.channels[3] = new Synth(this.AC, 3);
 
-        this.channels[4] = new Synth(this.AC, 4);
-        this.channels[5] = new Synth(this.AC, 5);
-        this.channels[6] = new Synth(this.AC, 6);
-        this.channels[7] = new Synth(this.AC, 7);
+        // Create the simple synths
+        this.channels[4] = new SimpleSynth(this.AC, 4);
+        this.channels[5] = new SimpleSynth(this.AC, 5);
+        this.channels[6] = new SimpleSynth(this.AC, 6);
+        this.channels[7] = new SimpleSynth(this.AC, 7);
+        this.channels[8] = new SimpleSynth(this.AC, 8);
+        this.channels[9] = new SimpleSynth(this.AC, 9);
+        this.channels[10] = new SimpleSynth(this.AC, 10);
+        this.channels[11] = new SimpleSynth(this.AC, 11);
+        this.channels[12] = new SimpleSynth(this.AC, 12);
+        this.channels[13] = new SimpleSynth(this.AC, 13);
+        this.channels[14] = new SimpleSynth(this.AC, 14);
+        this.channels[15] = new SimpleSynth(this.AC, 15);
 
         // Create all master effects
         this.effects.distortion = new Nodes.Distortion(this.AC);
@@ -64,6 +76,7 @@ export default class Mixer {
         // Connect all channels
         for (let id in this.channels) this.channels[id].connect(this.effects.distortion.getNode());
 
+        // Connect all effects
         this.effects.distortion.connect(this.effects.bitcrusher.getNode());
         this.effects.bitcrusher.connect(this.effects.filter.getNode());
         this.effects.filter.connect(this.effects.reverb.getNode());
@@ -72,14 +85,22 @@ export default class Mixer {
 
         this.masterVolume.connect(this.AC.destination);
 
-        // Append all channels to this element
+        // Append all channels to group elements
         this.synthGroup1 = document.createElement('div');
-        this.synthGroup1.className = 'group';
+        this.synthGroup1.className = 'group synth';
         this.el.appendChild(this.synthGroup1);
 
         this.synthGroup2 = document.createElement('div');
         this.synthGroup2.className = 'group';
         this.el.appendChild(this.synthGroup2);
+
+        this.synthGroup3 = document.createElement('div');
+        this.synthGroup3.className = 'group';
+        this.el.appendChild(this.synthGroup3);
+
+        this.synthGroup4 = document.createElement('div');
+        this.synthGroup4.className = 'group';
+        this.el.appendChild(this.synthGroup4);
 
         this.channels[0].install(this.synthGroup1);
         this.channels[1].install(this.synthGroup1);
@@ -89,10 +110,17 @@ export default class Mixer {
         this.channels[5].install(this.synthGroup2);
         this.channels[6].install(this.synthGroup2);
         this.channels[7].install(this.synthGroup2);
-
-        // for (let id in this.channels) this.channels[id].install(this.synthGroup1);
+        this.channels[8].install(this.synthGroup3);
+        this.channels[9].install(this.synthGroup3);
+        this.channels[10].install(this.synthGroup3);
+        this.channels[11].install(this.synthGroup3);
+        this.channels[12].install(this.synthGroup4);
+        this.channels[13].install(this.synthGroup4);
+        this.channels[14].install(this.synthGroup4);
+        this.channels[15].install(this.synthGroup4);
 
         this.el.appendChild(this.masterEl);
+        this.el.appendChild(this.masterEl2);
         host.appendChild(this.el);
     }
 
@@ -108,32 +136,32 @@ export default class Mixer {
     // Display Update Functions
     updateVolEl = () => {
         const val = Math.floor(this.masterVolume.getGain() * 255).toString(16);
-        this.setContent(this.volValue, val.length === 2 ? val : `0${val}`);
+        setContent(this.volValue, val.length === 2 ? val : `0${val}`);
     }
     updateDisEl = () => {
         const val = Math.floor(this.effects.distortion.getAmount() * 255).toString(16);
-        this.setContent(this.disValue, val.length === 2 ? val : `0${val}`);
+        setContent(this.disValue, val.length === 2 ? val : `0${val}`);
     }
     updateRevEl = () => {
         const val = Math.floor(this.effects.reverb.getAmount() * 255).toString(16);
-        this.setContent(this.revValue, val.length === 2 ? val : `0${val}`);
+        setContent(this.revValue, val.length === 2 ? val : `0${val}`);
     }
     updateBitEl = () => {
         const bitVal = (this.effects.bitcrusher.getBitDepth() - 1).toString(16);
         const val = Math.floor(this.effects.bitcrusher.getAmount() * 15).toString(16);
-        this.setContent(this.bitValue, `${bitVal}${val}`);
+        setContent(this.bitValue, `${bitVal}${val}`);
     }
     updateFilEl = () => {
-        const val = this.reverseAttenuate(this.effects.filter.getFreq() / this.effects.filter.maxFreq, 127);
+        const val = reverseAttenuate(this.effects.filter.getFreq() / this.effects.filter.maxFreq, 127);
         const hex = this.effects.filter.getType() === 'highpass'
             ? Math.round(val + 128).toString(16)
             : Math.round(val).toString(16);
-        this.setContent(this.filValue, hex.length === 2 ? hex : `0${hex}`);
+        setContent(this.filValue, hex.length === 2 ? hex : `0${hex}`);
     }
     updateComEl = () => {
         const threshold = (this.effects.compressor.getThreshold() / -4).toString(16);
         const ratio = (this.effects.compressor.getRatio() - 1).toString(16);
-        this.setContent(this.comValue, `${threshold}${ratio}`);
+        setContent(this.comValue, `${threshold}${ratio}`);
     }
 
     // Effect Functions
@@ -164,7 +192,7 @@ export default class Mixer {
     setFilter(args) {
         if (args.length > 2 || /[g-z]/.test(args)) { console.warn(`Misformatted fil`); return; }
         const val = parseInt(args, 16);
-        const freq = this.effects.filter.maxFreq * this.attenuate((val % 128), 127);;
+        const freq = this.effects.filter.maxFreq * attenuate((val % 128), 127);;
         const waveform = val >= 128 ? 'highpass' : 'lowpass';
 
         this.effects.filter.setType(waveform);
@@ -218,16 +246,13 @@ export default class Mixer {
         this.run(
             '0ENV0600;0OSCSI;1ENV0600;1OSCSI;2ENV0600;2OSCSI;3ENV0600;3OSCSI;'
             + '4ENV0600;4OSCSI;5ENV0600;5OSCSI;6ENV0600;6OSCSI;7ENV0600;7OSCSI;'
-            + '4DIS00;4REV0;4DEL00F0;4FIL80;4PAN80;4VIB00;'
-            + '5DIS00;5REV0;5DEL00F0;5FIL80;5PAN80;5VIB00;'
-            + '6DIS00;6REV0;6DEL00F0;6FIL80;6PAN80;6VIB00;'
-            + '7DIS00;7REV0;7DEL00F0;7FIL80;7PAN80;7VIB00;'
-            + 'DIS00;REV00;BIT70;FIL80;COM80;VOLBF'
+            + '8ENV0600;8OSCSI;9ENV0600;9OSCSI;AENV0600;AOSCSI;BENV0600;BOSCSI;'
+            + 'CENV0600;COSCSI;DENV0600;DOSCSI;EENV0600;EOSCSI;FENV0600;FOSCSI;'
+            + '0DIS00;0REV00;0DEL00;0FIL80;0PAN80;0VIB00;'
+            + '1DIS00;1REV00;1DEL00;1FIL80;1PAN80;1VIB00;'
+            + '2DIS00;2REV00;2DEL00;2FIL80;2PAN80;2VIB00;'
+            + '3DIS00;3REV00;3DEL00;3FIL80;3PAN80;3VIB00;'
+            + 'DIS00;REV00;BIT70;FIL80;COM80;VOL80'
         );
     }
-
-    // Util
-    setContent(el, ct) { if (el.innerHTML !== ct) el.innerHTML = ct; }
-    attenuate(val, base = 16) { return Math.pow(val, 2) / Math.pow(base, 2); }
-    reverseAttenuate(val, base) { return Math.sqrt(Math.pow(base, 2) * val); }
 }
