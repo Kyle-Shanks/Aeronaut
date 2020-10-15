@@ -28,6 +28,8 @@
 
             controller.add("default", "File", "Record", () => { aeronaut.recorder.toggle() }, "CmdOrCtrl+R");
             controller.add("default", "File", "Stop Recording", () => { aeronaut.recorder.stop() }, "Escape");
+            controller.add("default", "File", "Save Preset", () => { aeronaut.mixer.savePreset() }, "CmdOrCtrl+S");
+            controller.add("default", "File", "Open Preset", () => { aeronaut.mixer.openPreset() }, "CmdOrCtrl+O");
 
             controller.addRole('default', 'Edit', 'undo');
             controller.addRole('default', 'Edit', 'redo');

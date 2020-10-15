@@ -4,6 +4,9 @@ import Synth from './synth.js';
 import * as Nodes from './nodes/index.js';
 import { clamp, attenuate, reverseAttenuate, setContent } from './util.js';
 
+const { dialog } = require('@electron/remote');
+const fs = require('fs');
+
 export default class Mixer {
     constructor(aeronaut) {
         this.AC = aeronaut.AC;
@@ -132,6 +135,7 @@ export default class Mixer {
         host.appendChild(this.el);
     }
 
+    // Preset Commands
     getPresetCommand = () => {
         const arr = [];
         for (let id in this.channels) arr.push(this.channels[id].getPresetCommand());
@@ -144,6 +148,38 @@ export default class Mixer {
             + `BPM${this.bpmEl.innerHTML};`;
         arr.push(mixerPreset);
         return arr.join('').toUpperCase();
+    }
+
+    openPreset = () => {
+        dialog.showOpenDialog(
+            {
+                filters: [{ name: 'Aeronaut Preset', extensions: ['aero'] }],
+            }
+        ).then((path) => {
+            if (path === undefined || path.canceled) return;
+
+            fs.readFile(path.filePaths[0], "utf8", (err, res) => {
+                if (err) { console.error(err); return; }
+                this.run(res);
+                console.info('Mixer', 'Preset Opened.');
+            })
+        });
+    }
+
+    savePreset = () => {
+        dialog.showSaveDialog(
+            {
+                filters: [{ name: 'Aeronaut Preset', extensions: ['aero'] }],
+            }
+        ).then((path) => {
+            if (path === undefined || path.canceled) return;
+            const presetData = this.getPresetCommand();
+
+            fs.writeFile(path.filePath, presetData, {}, (err, res) => {
+                if (err) { console.error(err); return; }
+                console.info('Mixer', 'Preset Saved.');
+            });
+        });
     }
 
     start() {
@@ -276,10 +312,10 @@ export default class Mixer {
 
     reset = () => {
         this.run(
-            '0ENV0600;0OSCSI;1ENV0600;1OSCSI;2ENV0600;2OSCSI;3ENV0600;3OSCSI;'
-            + '4ENV0600;4OSCSI;5ENV0600;5OSCSI;6ENV0600;6OSCSI;7ENV0600;7OSCSI;'
-            + '8ENV0600;8OSCSI;9ENV0600;9OSCSI;AENV0600;AOSCSI;BENV0600;BOSCSI;'
-            + 'CENV0600;COSCSI;DENV0600;DOSCSI;EENV0600;EOSCSI;FENV0600;FOSCSI;'
+            '0ENV0600;0OSCSI;0VOLBF;1ENV0600;1OSCSI;1VOLBF;2ENV0600;2OSCSI;2VOLBF;3ENV0600;3OSCSI;3VOLBF;'
+            + '4ENV0600;4OSCSI;4VOLBF;5ENV0600;5OSCSI;5VOLBF;6ENV0600;6OSCSI;6VOLBF;7ENV0600;7OSCSI;7VOLBF;'
+            + '8ENV0600;8OSCSI;8VOLBF;9ENV0600;9OSCSI;9VOLBF;AENV0600;AOSCSI;AVOLBF;BENV0600;BOSCSI;BVOLBF;'
+            + 'CENV0600;COSCSI;CVOLBF;DENV0600;DOSCSI;DVOLBF;EENV0600;EOSCSI;EVOLBF;FENV0600;FOSCSI;FVOLBF;'
             + '0DIS00;0REV00;0DEL00;0FIL80;0PAN80;0VIB00;'
             + '1DIS00;1REV00;1DEL00;1FIL80;1PAN80;1VIB00;'
             + '2DIS00;2REV00;2DEL00;2FIL80;2PAN80;2VIB00;'
