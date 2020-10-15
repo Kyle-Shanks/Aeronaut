@@ -7,6 +7,7 @@ import Distortion from './distortion.js';
 import LFO from './lfo.js';
 import BitCrusher from './bitcrusher.js';
 import StereoPanner from './stereoPanner.js';
-import Compressor from './compressor.js'
+import Compressor from './compressor.js';
+import NoiseGenerator from './noiseGenerator.js';
 
-export { Gain, Filter, Oscillator, Reverb, Delay, Distortion, LFO, BitCrusher, StereoPanner, Compressor };
+export { Gain, Filter, Oscillator, Reverb, Delay, Distortion, LFO, BitCrusher, StereoPanner, Compressor, NoiseGenerator };

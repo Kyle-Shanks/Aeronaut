@@ -79,6 +79,7 @@ input {
 }
 #mixer .channel.synth { width: 480px; }
 #mixer .channel .cid { color: #1d8282; }
+#mixer .channel.noise .cid { color: #908323; }
 
 #mixer .effect {
     position: relative;

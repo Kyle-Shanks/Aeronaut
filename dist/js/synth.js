@@ -61,10 +61,24 @@ export default class Synth extends SimpleSynth {
         host.appendChild(this.el);
     }
 
+    getPresetCommand = () => {
+        const cid = this.cidEl.innerHTML;
+        return `${cid}ENV${this.envEl.innerHTML};`
+            + `${cid}OSC${this.oscEl.innerHTML};`
+            + `${cid}VOL${this.volEl.innerHTML};`
+            // Effects
+            + `${cid}VIB${this.vibValue.innerHTML};`
+            + `${cid}PAN${this.panValue.innerHTML};`
+            + `${cid}DEL${this.delValue.innerHTML};`
+            + `${cid}DIS${this.disValue.innerHTML};`
+            + `${cid}FIL${this.filValue.innerHTML};`
+            + `${cid}REV${this.revValue.innerHTML};`
+    };
+
     // Special function for bpm update
     updateBpm = (bpm) => {
         this.bpm = bpm;
-        // Update value for delay time
+        // TODO: Update value for delay time
     }
 
     // Display Update Functions

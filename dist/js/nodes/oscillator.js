@@ -26,7 +26,7 @@ class Oscillator {
     getFreq = () => this.node.frequency.value;
 
     // Setters
-    setType = type => {
+    setType = (type) => {
         if (!this.WAVEFORMS.includes(type)) return false;
         this.node.type = type;
     }

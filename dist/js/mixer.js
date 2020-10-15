@@ -1,3 +1,4 @@
+import NoiseSynth from './noiseSynth.js';
 import SimpleSynth from './simpleSynth.js';
 import Synth from './synth.js';
 import * as Nodes from './nodes/index.js';
@@ -70,8 +71,8 @@ export default class Mixer {
         this.channels[11] = new SimpleSynth(this.AC, 11);
         this.channels[12] = new SimpleSynth(this.AC, 12);
         this.channels[13] = new SimpleSynth(this.AC, 13);
-        this.channels[14] = new SimpleSynth(this.AC, 14);
-        this.channels[15] = new SimpleSynth(this.AC, 15);
+        this.channels[14] = new NoiseSynth(this.AC, 14);
+        this.channels[15] = new NoiseSynth(this.AC, 15);
 
         // Create all master effects
         this.effects.distortion = new Nodes.Distortion(this.AC);
@@ -129,6 +130,20 @@ export default class Mixer {
         this.el.appendChild(this.masterEl);
         this.el.appendChild(this.masterEl2);
         host.appendChild(this.el);
+    }
+
+    getPresetCommand = () => {
+        const arr = [];
+        for (let id in this.channels) arr.push(this.channels[id].getPresetCommand());
+        const mixerPreset = `DIS${this.disValue.innerHTML};`
+            + `BIT${this.bitValue.innerHTML};`
+            + `REV${this.revValue.innerHTML};`
+            + `FIL${this.filValue.innerHTML};`
+            + `COM${this.comValue.innerHTML};`
+            + `VOL${this.volValue.innerHTML};`
+            + `BPM${this.bpmEl.innerHTML};`;
+        arr.push(mixerPreset);
+        return arr.join('').toUpperCase();
     }
 
     start() {

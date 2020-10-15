@@ -1,5 +1,5 @@
 import * as Nodes from './nodes/index.js';
-import { clamp, attenuate, setContent, noteToFreq, getLengthFromBpm, bpmLengthToHex } from './util.js';
+import { clamp, attenuate, setContent, noteToFreq, getLengthFromBpm } from './util.js';
 
 const WAVENAMES = ['si', 'tr', 'sq', 'sw'];
 const WAVEFORMS = ['sine', 'triangle', 'square', 'sawtooth'];
@@ -67,6 +67,13 @@ export default class SimpleSynth {
     }
 
     connect(destination) { this.volume.connect(destination); }
+
+    getPresetCommand = () => {
+        const cid = this.cidEl.innerHTML;
+        return `${cid}ENV${this.envEl.innerHTML};`
+            + `${cid}OSC${this.oscEl.innerHTML};`
+            + `${cid}VOL${this.volEl.innerHTML};`
+    };
 
     // Special function for bpm update
     updateBpm = (bpm) => { this.bpm = bpm; }
