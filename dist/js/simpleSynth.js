@@ -1,5 +1,5 @@
 import * as Nodes from './nodes/index.js';
-import { clamp, attenuate, setContent, noteToFreq } from './util.js';
+import { clamp, attenuate, setContent, noteToFreq, getLengthFromBpm, bpmLengthToHex } from './util.js';
 
 const WAVENAMES = ['si', 'tr', 'sq', 'sw'];
 const WAVEFORMS = ['sine', 'triangle', 'square', 'sawtooth'];
@@ -7,6 +7,7 @@ const WAVEFORMS = ['sine', 'triangle', 'square', 'sawtooth'];
 export default class SimpleSynth {
     constructor(AC, id) {
         this.AC = AC;
+        this.bpm = 120;
 
         this.el = document.createElement('div');
         this.el.id = `ch${id.toString(16)}`;
@@ -67,6 +68,9 @@ export default class SimpleSynth {
 
     connect(destination) { this.volume.connect(destination); }
 
+    // Special function for bpm update
+    updateBpm = (bpm) => { this.bpm = bpm; }
+
     // Display Update Functions
     updateAllEl() {
         this.updateEnvEl();
@@ -125,12 +129,14 @@ export default class SimpleSynth {
         const freq = noteToFreq(note, octave);
 
         const velocity = args.length >= 3 ? attenuate(parseInt(args.slice(2, 3), 16)) : 1;
-        const length = args.length >= 4 ? (parseInt(args.slice(3, 4), 16) / 15) : 0.125;
+
+        const lengthVal = args.length >= 4 ? parseInt(args.slice(3, 4), 16) : 7;
+        const length = getLengthFromBpm(this.bpm, lengthVal);
 
         return { isNote: true, freq, length, velocity };
     }
     parseEnv(args) {
-        if (args.length < 1) { console.warn(`Misformatted env`); return; }
+        if (args.length < 1 || /[g-z]/.test(args)) { console.warn(`Misformatted env`); return; }
 
         const attack = parseInt(args.slice(0, 1), 16) / 15
         const decay = args.length > 1 ? parseInt(args.slice(1, 2), 16) / 15 : null
@@ -170,14 +176,15 @@ export default class SimpleSynth {
     // Note trigger methods
     noteOn = (note) => {
         const { freq, velocity, length } = note;
-        if (isNaN(freq) || isNaN(velocity) || isNaN(length)) return;
-        this.clearTimeouts();
+        // null or zero shouldn't play the note
+        if (!freq || !velocity || !length) return;
 
+        this.clearTimeouts();
         this.osc.setFreq(freq);
 
         // Gain Envelope ADS (R is in noteOff())
         if (this.gainEnv.a) {
-            this.gain.setGain(0); // Reset Volume
+            this.gain.setGain(0, 0.005); // Reset Volume
             this.gain.setGain(velocity, (this.gainEnv.a / 5)); // Attack
 
             if (this.gainEnv.a < length) {
@@ -187,7 +194,7 @@ export default class SimpleSynth {
                 this.timeoutIds.push(timeoutId);
             }
         } else {
-            this.gain.setGain(velocity); // Reset Volume
+            this.gain.setGain(velocity, 0.005); // Reset Volume
             this.gain.setGain(this.gainEnv.s * velocity, (this.gainEnv.d / 5)); // Decay
         }
 

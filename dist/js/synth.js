@@ -61,6 +61,12 @@ export default class Synth extends SimpleSynth {
         host.appendChild(this.el);
     }
 
+    // Special function for bpm update
+    updateBpm = (bpm) => {
+        this.bpm = bpm;
+        // Update value for delay time
+    }
+
     // Display Update Functions
     updateAllEl() {
         this.updateEnvEl();

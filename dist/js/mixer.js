@@ -1,11 +1,13 @@
 import SimpleSynth from './simpleSynth.js';
 import Synth from './synth.js';
 import * as Nodes from './nodes/index.js';
-import { attenuate, reverseAttenuate, setContent } from './util.js';
+import { clamp, attenuate, reverseAttenuate, setContent } from './util.js';
 
 export default class Mixer {
     constructor(aeronaut) {
         this.AC = aeronaut.AC;
+        this.bpm = 120;
+
         this.el = document.createElement('div');
         this.el.id = 'mixer';
 
@@ -21,6 +23,11 @@ export default class Mixer {
         this.createEffectElement('rev', this.masterEl);
         this.createEffectElement('com', this.masterEl2);
         this.createEffectElement('vol', this.masterEl2);
+
+        // Bpm Element
+        this.bpmEl = document.createElement('div');
+        this.bpmEl.className = 'effect bpm';
+        this.masterEl2.appendChild(this.bpmEl);
 
         this.masterVolume = new Nodes.Gain(this.AC); // Master Volume
         this.masterVolume.setGain(0.75);
@@ -138,6 +145,9 @@ export default class Mixer {
         const val = Math.floor(this.masterVolume.getGain() * 255).toString(16);
         setContent(this.volValue, val.length === 2 ? val : `0${val}`);
     }
+    updateBpmEl = () => {
+        setContent(this.bpmEl, this.bpm);
+    }
     updateDisEl = () => {
         const val = Math.floor(this.effects.distortion.getAmount() * 255).toString(16);
         setContent(this.disValue, val.length === 2 ? val : `0${val}`);
@@ -169,6 +179,12 @@ export default class Mixer {
         if (args.length > 2 || /[g-z]/.test(args)) { console.warn(`Misformatted vol`); return; }
         this.masterVolume.setGain(parseInt(args, 16) / 255);
         setTimeout(this.updateVolEl, 50);
+    }
+    setBpm(args) {
+        if (args.length < 2 || args.length > 3 || /\D/.test(args)) { console.warn(`Misformatted bpm`); return; }
+        this.bpm = clamp(parseInt(args), 30, 300);
+        for (let id in this.channels) this.channels[id].updateBpm(this.bpm);
+        setTimeout(this.updateBpmEl, 50);
     }
     setDistortion(args) {
         if (args.length > 2 || /[g-z]/.test(args)) { console.warn(`Misformatted dis`); return; }
@@ -233,6 +249,7 @@ export default class Mixer {
             else if (cmd === 'fil') return this.setFilter(args);
             else if (cmd === 'com') return this.setCompressor(args);
             else if (cmd === 'vol') return this.setMasterVolume(args);
+            else if (cmd === 'bpm') return this.setBpm(args);
         }
 
         // Channel check
@@ -252,7 +269,7 @@ export default class Mixer {
             + '1DIS00;1REV00;1DEL00;1FIL80;1PAN80;1VIB00;'
             + '2DIS00;2REV00;2DEL00;2FIL80;2PAN80;2VIB00;'
             + '3DIS00;3REV00;3DEL00;3FIL80;3PAN80;3VIB00;'
-            + 'DIS00;REV00;BIT70;FIL80;COM80;VOL80'
+            + 'DIS00;REV00;BIT70;FIL80;COM80;VOL80;BPM120'
         );
     }
 }

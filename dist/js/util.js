@@ -6,6 +6,35 @@ export const reverseAttenuate = (val, base = 16) => Math.sqrt(Math.pow(base, 2) 
 // Dom Functions
 export const setContent = (el, ct) => { if (el.innerHTML !== ct) el.innerHTML = ct; }
 
+// Note Lengths
+const noteLengthMap = {
+    0: 0,
+    1: 1/32,
+    2: 1/24,
+    3: 1/16,
+    4: 1/12,
+    5: 1/8,
+    6: 1/6,
+    7: 1/4,
+    8: 1/3,
+    9: 1/2,
+    10: 1,
+    11: 3/2,
+    12: 2,
+    13: 3,
+    14: 4,
+    15: 8,
+};
+
+// Convert bpm to time (in seconds) based on note length
+export const getLengthFromBpm = (bpm, len = 7) => (60 / bpm) * noteLengthMap[len];
+export const bpmLengthToHex = (bpm, noteLength) => {
+    if (noteLength <= 0.01) return 0;
+    let lengthIndex = -1;
+    for (let i in noteLengthMap) { if (getLengthFromBpm(bpm, i) === noteLength) lengthIndex = i; }
+    return parseInt(lengthIndex).toString(16);
+};
+
 // Note Functions
 const inputToNoteMap = {
     'A': 'A0',

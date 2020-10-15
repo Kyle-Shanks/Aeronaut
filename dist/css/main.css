@@ -52,6 +52,12 @@ input {
     margin-bottom: 1rem;
 }
 
+#mixer .bpm {
+    margin-top: 1rem;
+    text-align: center;
+    color: #72dec2;
+}
+
 #mixer .group { width: 120px; }
 #mixer .group.synth { width: 480px; margin-bottom: 1rem; }
 #mixer .group.master { width: 60px; }
