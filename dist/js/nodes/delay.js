@@ -16,6 +16,7 @@ class Delay {
         this.feedbackGain.connect(this.wetGain.getNode());
         this.feedbackGain.connect(this.delayNode);
 
+        this.amount = 0;
         this.maxDelayTime = 1;
 
         this.setAmount(0);
@@ -36,15 +37,21 @@ class Delay {
 
     // Getters
     getNode = () => [this.dryGain.getNode(), this.tone.getNode()];
-    getAmount = () => this.wetGain.getGain();
+    getAmount = () => this.amount;
     getDelayTime = () => this.delayNode.delayTime.value;
     getTone = () => this.tone.getFreq();
     getFeedback = () => this.feedbackGain.getGain();
 
     // Setters
     setAmount = val => {
-        this.dryGain.setGain(1 - val);
-        this.wetGain.setGain(val);
+        this.amount = val;
+        if (val < 0.5) {
+            this.dryGain.setGain(1);
+            this.wetGain.setGain(val * 2);
+        } else {
+            this.dryGain.setGain(1 - ((val - 0.5) * 2));
+            this.wetGain.setGain(1);
+        }
     }
     setFeedback = val => this.feedbackGain.setGain(val);
     setTone = val => this.tone.setFreq(val);
