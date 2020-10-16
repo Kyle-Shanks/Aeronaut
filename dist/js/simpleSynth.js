@@ -137,7 +137,7 @@ export default class SimpleSynth {
 
         const velocity = args.length >= 3 ? attenuate(parseInt(args.slice(2, 3), 16)) : 1;
 
-        const lengthVal = args.length >= 4 ? parseInt(args.slice(3, 4), 16) : 7;
+        const lengthVal = args.length >= 4 ? parseInt(args.slice(3, 4), 16) : 5;
         const length = getLengthFromBpm(this.bpm, lengthVal);
 
         return { isNote: true, freq, length, velocity };

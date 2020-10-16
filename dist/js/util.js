@@ -9,25 +9,25 @@ export const setContent = (el, ct) => { if (el.innerHTML !== ct) el.innerHTML = 
 // Note Lengths
 const noteLengthMap = {
     0: 0,
-    1: 1/32,
-    2: 1/24,
-    3: 1/16,
-    4: 1/12,
-    5: 1/8,
-    6: 1/6,
-    7: 1/4,
-    8: 1/3,
-    9: 1/2,
-    10: 1,
-    11: 3/2,
-    12: 2,
-    13: 3,
-    14: 4,
-    15: 8,
+    1: 1/8,     // 1/32 note
+    2: 1/6,     // 1/24 note
+    3: 1/4,     // 1/16 note
+    4: 1/3,     // 1/12 note
+    5: 1/2,     // 1/8 note
+    6: 1/1.5,   // 1/6 note
+    7: 1,       // 1/4 note
+    8: 1.5,     // 1/3 note
+    9: 2,       // 1/2 note
+    10: 3,      // 3/4 note
+    11: 4,      // whole note / 1 bar
+    12: 6,      // 1.5 bars
+    13: 8,      // 2 bars
+    14: 12,     // 3 bars
+    15: 16,     // 4 bars
 };
 
 // Convert bpm to time (in seconds) based on note length
-export const getLengthFromBpm = (bpm, len = 7) => (60 / bpm) * noteLengthMap[len];
+export const getLengthFromBpm = (bpm, len = 5) => (60 / bpm) * noteLengthMap[len];
 export const bpmLengthToHex = (bpm, noteLength) => {
     if (noteLength <= 0.01) return 0;
     let lengthIndex = -1;
