@@ -60,7 +60,9 @@ input {
 
 #mixer .group { width: 120px; }
 #mixer .group.synth { width: 480px; margin-bottom: 1rem; }
+#mixer .group.synth .effect { display: inline-block; }
 #mixer .group.master { width: 60px; }
+#mixer .group.master.dynamics .label { color: #72dec2; }
 
 #mixer .channel {
     position: relative;
@@ -88,7 +90,6 @@ input {
     width: 60px;
 }
 #mixer .effect .label { color: #444; padding-right: 0.25rem; }
-#mixer .group.synth .effect { display: inline-block; }
 
 /* Commander */
 #commander { display: block; position: relative; }

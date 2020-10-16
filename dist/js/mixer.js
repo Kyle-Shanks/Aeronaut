@@ -18,7 +18,7 @@ export default class Mixer {
         this.masterEl = document.createElement('div');
         this.masterEl.className = 'group master';
         this.masterEl2 = document.createElement('div');
-        this.masterEl2.className = 'group master';
+        this.masterEl2.className = 'group master dynamics';
 
         // Effect Elements
         this.createEffectElement('dis', this.masterEl);
@@ -58,24 +58,11 @@ export default class Mixer {
         console.info('Mixer is installing...');
 
         // Create the full synths
-        this.channels[0] = new Synth(this.AC, 0);
-        this.channels[1] = new Synth(this.AC, 1);
-        this.channels[2] = new Synth(this.AC, 2);
-        this.channels[3] = new Synth(this.AC, 3);
-
+        for (let i = 0; i < 4; i++) this.channels[i] = new Synth(this.AC, i);
         // Create the simple synths
-        this.channels[4] = new SimpleSynth(this.AC, 4);
-        this.channels[5] = new SimpleSynth(this.AC, 5);
-        this.channels[6] = new SimpleSynth(this.AC, 6);
-        this.channels[7] = new SimpleSynth(this.AC, 7);
-        this.channels[8] = new SimpleSynth(this.AC, 8);
-        this.channels[9] = new SimpleSynth(this.AC, 9);
-        this.channels[10] = new SimpleSynth(this.AC, 10);
-        this.channels[11] = new SimpleSynth(this.AC, 11);
-        this.channels[12] = new SimpleSynth(this.AC, 12);
-        this.channels[13] = new SimpleSynth(this.AC, 13);
-        this.channels[14] = new NoiseSynth(this.AC, 14);
-        this.channels[15] = new NoiseSynth(this.AC, 15);
+        for (let i = 4; i < 14; i++) this.channels[i] = new SimpleSynth(this.AC, i);
+        // Create the noise synths
+        for (let i = 14; i < 16; i++) this.channels[i] = new NoiseSynth(this.AC, i);
 
         // Create all master effects
         this.effects.distortion = new Nodes.Distortion(this.AC);
@@ -85,7 +72,10 @@ export default class Mixer {
         this.effects.compressor = new Nodes.Compressor(this.AC);
 
         // Connect all channels
-        for (let id in this.channels) this.channels[id].connect(this.effects.distortion.getNode());
+        // Connect synth channels directly to compressor
+        for (let i = 0; i < 4; i++) this.channels[i].connect(this.effects.compressor.getNode());
+        // Connect simple and noise synths to all master effects
+        for (let i = 4; i < 16; i++) this.channels[i].connect(this.effects.distortion.getNode());
 
         // Connect all effects
         this.effects.distortion.connect(this.effects.bitcrusher.getNode());
@@ -113,22 +103,10 @@ export default class Mixer {
         this.synthGroup4.className = 'group';
         this.el.appendChild(this.synthGroup4);
 
-        this.channels[0].install(this.synthGroup1);
-        this.channels[1].install(this.synthGroup1);
-        this.channels[2].install(this.synthGroup1);
-        this.channels[3].install(this.synthGroup1);
-        this.channels[4].install(this.synthGroup2);
-        this.channels[5].install(this.synthGroup2);
-        this.channels[6].install(this.synthGroup2);
-        this.channels[7].install(this.synthGroup2);
-        this.channels[8].install(this.synthGroup3);
-        this.channels[9].install(this.synthGroup3);
-        this.channels[10].install(this.synthGroup3);
-        this.channels[11].install(this.synthGroup3);
-        this.channels[12].install(this.synthGroup4);
-        this.channels[13].install(this.synthGroup4);
-        this.channels[14].install(this.synthGroup4);
-        this.channels[15].install(this.synthGroup4);
+        for (let i = 0; i < 4; i++) this.channels[i].install(this.synthGroup1);
+        for (let i = 4; i < 8; i++) this.channels[i].install(this.synthGroup2);
+        for (let i = 8; i < 12; i++) this.channels[i].install(this.synthGroup3);
+        for (let i = 12; i < 16; i++) this.channels[i].install(this.synthGroup4);
 
         this.el.appendChild(this.masterEl);
         this.el.appendChild(this.masterEl2);
