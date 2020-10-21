@@ -1,6 +1,8 @@
 # Aeronaut
 Aeronaut is a minimal synthesizer built to be controlled and play sounds by receiving UDP messages. This is very much a rebuild of an amazing synthesizer called [Pilot](https://github.com/hundredrabbits/Pilot) and has also been created to be a companion application to the livecoding environment [ORCA](https://github.com/hundredrabbits/Orca).
 
+![Aeronaut](img/aero.png)
+
 ## Getting Started
 To run Aeronaut, run these commands:
 
