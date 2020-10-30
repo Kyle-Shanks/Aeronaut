@@ -24,7 +24,7 @@ Standalone builds for Mac/Windows/Linux that can be made for download if there i
 ## Overview
 Aeronaut is composed of 4 primary synths, 10 simple synths, and 2 noise synths.
 
-The 4 primary synths at the top have their own individual effects (Vibrato, Stereo Panning, Delay, Distortion, Filter, and Reverb) and are routed directly to the master dynamics chain (Compressor and Master Volume).
+The 4 primary synths at the top have their own individual effects (Vibrato, Stereo Panning, Delay, Distortion, Filter, and Reverb) and are routed directly to the master dynamics chain (Compressor, Equalizer, and Master Volume).
 
 The 10 simple synths and 2 noise synths share a chain of 4 effects (Distortion, Bit Crusher, Filter, and Reverb) which is then routed to the master dynamics chain.
 
@@ -37,7 +37,7 @@ e.g. `03C;13d;23a` will play a cm7 [famichord](https://www.youtube.com/watch?v=a
 Global commands can be run to update master effects and things like the Bpm with these commands:
 ```
 DIS/BIT/FIL/REV - Master effects
-COM/VOL - Master Dynamics
+COM/EQU/VOL - Master Dynamics
 BPM - Bpm (Used for note lengths and effects like delay)
 ```
 
@@ -103,15 +103,16 @@ The 4 primary synths also have access to commands that will update their individ
 
 ### Effects Description
 ```
-VIB - (Depth [0-F], Rate [0-F])
-PAN - (Left amount [00-7F]/Right amount [80-FF])
-DEL - (Delay Time[0-F], Wet/Dry [0-F])
-DIS - (Wet/Dry [00-FF])
-BIT - (Bit Depth [0-F], Wet/Dry [0-F])
-FIL - (Lowpass amount [00-7F]/Highpass amount [80-FF])
-REV - (Wet/Dry [00-FF])
-COM - (Cutoff [0-F], Ratio [0-F])
-VOL - (Gain [00-FF])
+VIB - [Vibrato] (Depth [0-F], Rate [0-F])
+PAN - [Stereo Panning] (Left amount [00-7F]/Right amount [80-FF])
+DEL - [Delay] (Delay Time[0-F], Wet/Dry [0-F])
+DIS - [Distortion] (Wet/Dry [00-FF])
+BIT - [Bit Crusher] (Bit Depth [0-F], Wet/Dry [0-F])
+FIL - [Filter] (Lowpass amount [00-7F]/Highpass amount [80-FF])
+REV - [Reverb] (Wet/Dry [00-FF])
+COM - [Compressor] (Cutoff [0-F], Ratio [0-F])
+EQU - [Equalizer] (Low Gain [0-F], High Gain [0-F])
+VOL - [Volume] (Gain [00-FF])
 ```
 
 ## Presets
