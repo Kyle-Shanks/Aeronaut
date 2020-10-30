@@ -9,5 +9,19 @@ import BitCrusher from './bitcrusher.js';
 import StereoPanner from './stereoPanner.js';
 import Compressor from './compressor.js';
 import NoiseGenerator from './noiseGenerator.js';
+import EQ2 from './eq2.js';
 
-export { Gain, Filter, Oscillator, Reverb, Delay, Distortion, LFO, BitCrusher, StereoPanner, Compressor, NoiseGenerator };
+export {
+    Gain,
+    Filter,
+    Oscillator,
+    Reverb,
+    Delay,
+    Distortion,
+    LFO,
+    BitCrusher,
+    StereoPanner,
+    Compressor,
+    NoiseGenerator,
+    EQ2,
+};

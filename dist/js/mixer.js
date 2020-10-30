@@ -26,6 +26,7 @@ export default class Mixer {
         this.createEffectElement('fil', this.masterEl);
         this.createEffectElement('rev', this.masterEl);
         this.createEffectElement('com', this.masterEl2);
+        this.createEffectElement('equ', this.masterEl2);
         this.createEffectElement('vol', this.masterEl2);
 
         // Bpm Element
@@ -70,6 +71,7 @@ export default class Mixer {
         this.effects.filter = new Nodes.Filter(this.AC);
         this.effects.reverb = new Nodes.Reverb(this.AC);
         this.effects.compressor = new Nodes.Compressor(this.AC);
+        this.effects.eq2 = new Nodes.EQ2(this.AC);
 
         // Connect all channels
         // Connect synth channels directly to compressor
@@ -82,7 +84,8 @@ export default class Mixer {
         this.effects.bitcrusher.connect(this.effects.filter.getNode());
         this.effects.filter.connect(this.effects.reverb.getNode());
         this.effects.reverb.connect(this.effects.compressor.getNode());
-        this.effects.compressor.connect(this.masterVolume.getNode());
+        this.effects.compressor.connect(this.effects.eq2.getNode());
+        this.effects.eq2.connect(this.masterVolume.getNode());
 
         this.masterVolume.connect(this.AC.destination);
 
@@ -122,6 +125,7 @@ export default class Mixer {
             + `REV${this.revValue.innerHTML};`
             + `FIL${this.filValue.innerHTML};`
             + `COM${this.comValue.innerHTML};`
+            + `EQU${this.equValue.innerHTML};`
             + `VOL${this.volValue.innerHTML};`
             + `BPM${this.bpmEl.innerHTML};`;
         arr.push(mixerPreset);
@@ -202,6 +206,11 @@ export default class Mixer {
         const ratio = (this.effects.compressor.getRatio() - 1).toString(16);
         setContent(this.comValue, `${threshold}${ratio}`);
     }
+    updateEquEl = () => {
+        const lowGain = (this.effects.eq2.getLowGain() * 2).toString(16);
+        const highGain = (this.effects.eq2.getHighGain() * 2).toString(16);
+        setContent(this.equValue, `${lowGain}${highGain}`);
+    }
 
     // Effect Functions
     setMasterVolume(args) {
@@ -253,6 +262,15 @@ export default class Mixer {
         if (!isNaN(ratio)) this.effects.compressor.setRatio(ratio + 1);
         setTimeout(this.updateComEl, 50);
     }
+    setEqualizer(args) {
+        if (args.length > 2 || /[g-z]/.test(args)) { console.warn(`Misformatted equ`); return; }
+        const lowGain = parseInt(args.slice(0, 1), 16);
+        const highGain = parseInt(args.slice(1), 16);
+
+        if (!isNaN(lowGain)) this.effects.eq2.setLowGain(lowGain / 2);
+        if (!isNaN(highGain)) this.effects.eq2.setHighGain(highGain / 2);
+        setTimeout(this.updateEquEl, 50);
+    }
 
     // Run Command Function
     run(msg) {
@@ -277,6 +295,7 @@ export default class Mixer {
             else if (cmd === 'bit') return this.setBitcrusher(args);
             else if (cmd === 'fil') return this.setFilter(args);
             else if (cmd === 'com') return this.setCompressor(args);
+            else if (cmd === 'equ') return this.setEqualizer(args);
             else if (cmd === 'vol') return this.setMasterVolume(args);
             else if (cmd === 'bpm') return this.setBpm(args);
         }
@@ -298,7 +317,7 @@ export default class Mixer {
             + '1DIS00;1REV00;1DEL00;1FIL80;1PAN80;1VIB00;'
             + '2DIS00;2REV00;2DEL00;2FIL80;2PAN80;2VIB00;'
             + '3DIS00;3REV00;3DEL00;3FIL80;3PAN80;3VIB00;'
-            + 'DIS00;REV00;BIT70;FIL80;COM80;VOL80;BPM120'
+            + 'DIS00;REV00;BIT70;FIL80;COM80;EQU00;VOL80;BPM120'
         );
     }
 }
